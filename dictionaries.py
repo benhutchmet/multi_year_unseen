@@ -17,7 +17,9 @@ north_sea_kay = {
 }
 
 # Set up the path to the obs
-obs_path = "/home/users/benhutch/ERA5/adaptor.mars.internal-1691509121.3261805-29348-4-3a487c76-fc7b-421f-b5be-7436e2eb78d7.nc"
+obs_path = "/home/users/benhutch/ERA5/surface_wind_ERA5.nc"
+
+regrid_hadgem_obs_path = "/home/users/benhutch/ERA5/surface_wind_ERA5_regrid_HadGEM.nc"
 
 # Set up the gws base dir
 gws_base = "/gws/nopw/j04/canari/users/benhutch"
