@@ -15,3 +15,9 @@ north_sea_kay = {
     'lat1': 53, # degrees north
     'lat2': 59
 }
+
+# Set up the path to the obs
+obs_path = "/home/users/benhutch/ERA5/adaptor.mars.internal-1691509121.3261805-29348-4-3a487c76-fc7b-421f-b5be-7436e2eb78d7.nc"
+
+# Set up the gws base dir
+gws_base = "/gws/nopw/j04/canari/users/benhutch"
