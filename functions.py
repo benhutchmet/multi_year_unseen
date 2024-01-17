@@ -193,3 +193,100 @@ def load_model_data(model_variable: str,
 
     # Return the model data
     return model_data
+
+
+# Function for loading the observations
+def load_obs_data(obs_variable: str,
+                  regrid_obs_path: str,
+                  start_year: int,
+                  end_year: int,
+                  avg_period: int,
+                  grid: dict):
+    """
+    Function for loading the observations
+    
+    Parameters
+    ----------
+
+    obs_variable: str
+        The variable to load from the model data
+        E.g. 'si10' for sfcWind
+
+    regrid_obs_path: str
+        The path to the regridded observations
+
+    start_year: int
+        The start year for the data
+        E.g. 1961
+
+    end_year: int
+        The end year for the data
+        E.g. 1990
+
+    avg_period: int
+        The number of years to average over
+        E.g. 1 for 1-year, 5 for 5-year, etc.
+
+    grid: dict
+        The grid to load the data over
+
+    Returns
+
+    obs_data: np.array
+        The observations
+    """
+
+    # Set up the years
+    years = np.arange(start_year, end_year + 1)
+
+    # Set the n years
+    n_years = len(years)
+
+    # Extract the lon and lat bounds
+    lon1, lon2 = grid['lon1'], grid['lon2'] ; lat1, lat2 = grid['lat1'], grid['lat2']
+
+    # Open the obs
+    obs = xr.open_mfdataset(regrid_obs_path,
+                            combine='by_coords',
+                              parallel=True)[obs_variable]
+    
+    # Combine the first two expver variables
+    obs = obs.sel(expver=1).combine_first(obs.sel(expver=5))
+
+    # Extract the time series for the gridbox
+    obs = obs.sel(lat=slice(lat1, lat2),
+                  lon=slice(lon1, lon2)).mean(dim=('lat','lon'))
+    
+    # Print the years we are slicing over
+    print("Slicing over:", f"{start_year}-12-01", f"{start_year + avg_period}-11-30")
+
+    # Extract the time slice between
+    obs_slice = obs.sel(time=slice(f"{start_year}-12-01",
+                                   f"{start_year + avg_period}-11-30"))
+    
+    # Extract the nmonths
+    n_months = len(obs_slice['time'])
+
+    # Print the number of months
+    print("Number of months:", n_months)
+
+    # Form the empty array to store the data
+    obs_data = np.zeros([n_years, n_months])
+
+    # Print the shape of the obs data
+    print("Shape of obs data:", obs_data.shape)
+
+    # Loop over the years
+    for year in tqdm(years, desc="Processing years"):
+        # Extract the time slice between
+        obs_slice = obs.sel(time=slice(f"{year}-12-01",
+                                       f"{year + avg_period}-11-30"))
+
+        # Extract the data
+        obs_data[year - start_year, :] = obs_slice.values
+
+    # Print the shape of the obs data
+    print("Shape of obs data:", obs_data.shape)
+
+    # Return the obs data
+    return obs_data
