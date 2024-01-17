@@ -9,6 +9,7 @@ import glob
 import numpy as np
 import xarray as xr
 import pandas as pd
+from tqdm import tqdm
 
 # Path to modules
 import dictionaries as dicts
@@ -169,16 +170,13 @@ def load_model_data(model_variable: str,
     print("Shape of model data:", model_data.shape)
 
     # Loop over the years
-    for year in years:
-        # Logging
-        print("Loading year:", year)
-        for member in range(no_members):
-            print("Loading member index:", member)
+    for year in tqdm(years, desc="Processing years"):
+        for member in tqdm(range(no_members), desc=f"Processing members for year {year}", leave=False):
             # Find the file for the given year and member
             file = [file for file in model_file_list if f"s{year}" in file and f"r{member + 1}i" in file][0]
 
             # Load the file
-            ds = xr.open_dataset(f"{model_path}/{file}", chunks={'time': 10})
+            ds = xr.open_dataset(f"{model_path}/{file}")
 
             # Extract the time series for the gridbox
             ds = ds.sel(lat=slice(lat1, lat2),
