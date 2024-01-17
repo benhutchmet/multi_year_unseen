@@ -507,13 +507,33 @@ def plot_events(model_data: np.ndarray,
         plt.scatter(years, model_year[:, i], label=f'Model {i + 1}')
 
         # Separate data into two groups based on the condition
-        below_20th = model_data_ann_mean_bias[:, i] < obs_stats['min_20']
+        below_20th = model_year[:, i] < obs_stats['min_20']
         above_20th = ~below_20th
         
         # Plot points below the 20th percentile with a label
-        plt.scatter(years[below_20th], model_data_ann_mean_bias[below_20th, i],
+        plt.scatter(years[below_20th], model_year[below_20th, i],
                     color='blue', alpha=0.8, label='model wind drought' if i == 0 else None)
         
         # Plot points above the 20th percentile without a label
-        plt.scatter(years[above_20th], model_data_ann_mean_bias[above_20th, i],
+        plt.scatter(years[above_20th], model_year[above_20th, i],
                     color='grey', alpha=0.8, label='HadGEM3-GC31-MM' if i == 0 else None)
+        
+    # Plot the 20th percentile
+    plt.axhline(obs_stats['min_20'],
+                 color='black', linestyle='-')
+    
+    # Plot the min
+    plt.axhline(obs_stats['min'],
+                 color='black', linestyle='--')
+    
+    # Add a legend in the upper left
+    plt.legend(loc='upper left')
+
+    # Add the axis labels
+    plt.xlabel('Year')
+
+    # Add the axis labels
+    plt.ylabel('Wind speed (m/s)')
+
+    # Show the plot
+    plt.show()
