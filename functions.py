@@ -11,6 +11,7 @@ import xarray as xr
 import pandas as pd
 from tqdm import tqdm
 from scipy import stats
+import matplotlib.pyplot as plt
 
 # Path to modules
 import dictionaries as dicts
@@ -496,3 +497,23 @@ def plot_events(model_data: np.ndarray,
 
     # Set the figure size
     plt.figure(figsize=(figsize_x, figsize_y))
+
+    # Plot the obs
+    plt.scatter(years, obs_year, color='k', label='ERA5')
+
+    # Plot the model data
+    for i in range(model_year.shape[1]):
+        # Plot the model data
+        plt.scatter(years, model_year[:, i], label=f'Model {i + 1}')
+
+        # Separate data into two groups based on the condition
+        below_20th = model_data_ann_mean_bias[:, i] < obs_stats['min_20']
+        above_20th = ~below_20th
+        
+        # Plot points below the 20th percentile with a label
+        plt.scatter(years[below_20th], model_data_ann_mean_bias[below_20th, i],
+                    color='blue', alpha=0.8, label='model wind drought' if i == 0 else None)
+        
+        # Plot points above the 20th percentile without a label
+        plt.scatter(years[above_20th], model_data_ann_mean_bias[above_20th, i],
+                    color='grey', alpha=0.8, label='HadGEM3-GC31-MM' if i == 0 else None)
