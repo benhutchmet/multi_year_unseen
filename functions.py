@@ -10,6 +10,7 @@ import numpy as np
 import xarray as xr
 import pandas as pd
 from tqdm import tqdm
+from scipy import stats
 
 # Path to modules
 import dictionaries as dicts
@@ -290,3 +291,126 @@ def load_obs_data(obs_variable: str,
 
     # Return the obs data
     return obs_data
+
+# Function for calculating the obs_stats
+def calculate_obs_stats(obs_data: np.ndarray,
+                        start_year: int,
+                        end_year: int,
+                        avg_period: int,
+                        grid: dict):
+    """
+    Calculate the observations stats
+    
+    Parameters
+    ----------
+        
+        obs_data: np.ndarray
+            The observations data
+            With shape (nyears, nmonths)
+
+        start_year: int
+            The start year for the data
+            E.g. 1961
+
+        end_year: int
+            The end year for the data
+            E.g. 1990
+
+        avg_period: int
+            The number of years to average over
+            E.g. 1 for 1-year, 5 for 5-year, etc.
+
+        grid: dict
+            The grid to load the data over
+        
+    Returns
+    -------
+        
+        obs_stats: dict
+            A dictionary containing the obs stats
+    
+    """
+
+    # Define the mdi
+    mdi = -9999.0
+
+    # Define the obs stats
+    obs_stats = {
+        'mean': mdi,
+        'sigma': mdi,
+        'skew': mdi,
+        'kurt': mdi,
+        'start_year': mdi,
+        'end_year': mdi,
+        'avg_period': mdi,
+        'grid': mdi,
+        'min_20': mdi,
+        'max_20': mdi,
+        'min_10': mdi,
+        'max_10': mdi,
+        'min_5': mdi,
+        'max_5': mdi,
+        'min': mdi,
+        'max': mdi,
+        'sample_size': mdi
+    }
+
+    # Set the start year
+    obs_stats['start_year'] = start_year
+
+    # Set the end year
+    obs_stats['end_year'] = end_year
+
+    # Set the avg period
+    obs_stats['avg_period'] = avg_period
+
+    # Set the grid
+    obs_stats['grid'] = grid
+
+    # Process the obs
+    obs_copy = obs_data.copy()
+
+    # Take the mean over the 1th axis (i.e. over the 12 months)
+    obs_year = np.mean(obs_copy, axis=1)
+
+    # Get the sample size
+    obs_stats['sample_size'] = len(obs_year)
+
+    # Take the mean over the 0th axis (i.e. over the years)
+    obs_stats['mean'] = np.mean(obs_year)
+
+    # Take the standard deviation over the 0th axis (i.e. over the years)
+    obs_stats['sigma'] = np.std(obs_year)
+
+    # Take the skewness over the 0th axis (i.e. over the years)
+    obs_stats['skew'] = stats.skew(obs_year)
+
+    # Take the kurtosis over the 0th axis (i.e. over the years)
+    obs_stats['kurt'] = stats.kurtosis(obs_year)
+
+    # Take the min over the 0th axis (i.e. over the years)
+    obs_stats['min'] = np.min(obs_year)
+
+    # Take the max over the 0th axis (i.e. over the years)
+    obs_stats['max'] = np.max(obs_year)
+
+    # Take the min over the 0th axis (i.e. over the years)
+    obs_stats['min_5'] = np.percentile(obs_year, 5)
+
+    # Take the max over the 0th axis (i.e. over the years)
+    obs_stats['max_5'] = np.percentile(obs_year, 95)
+
+    # Take the min over the 0th axis (i.e. over the years)
+    obs_stats['min_10'] = np.percentile(obs_year, 10)
+
+    # Take the max over the 0th axis (i.e. over the years)
+    obs_stats['max_10'] = np.percentile(obs_year, 90)
+
+    # Take the min over the 0th axis (i.e. over the years)
+    obs_stats['min_20'] = np.percentile(obs_year, 20)
+
+    # Take the max over the 0th axis (i.e. over the years)
+    obs_stats['max_20'] = np.percentile(obs_year, 80)
+
+    # Return the obs stats
+    return obs_stats
