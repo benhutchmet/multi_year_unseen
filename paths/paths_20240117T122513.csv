@@ -1,0 +1,8 @@
+,variable,experiment,model,path
+0,sfcWind,dcppA-hindcast,HadGEM3-GC31-MM,/gws/nopw/j04/canari/users/benhutch/dcppA-hindcast/data/sfcWind/HadGEM3-GC31-MM/merged_files
+1,sfcWind,dcppA-hindcast,EC-Earth3,/gws/nopw/j04/canari/users/benhutch/dcppA-hindcast/data/sfcWind/EC-Earth3/merged_files
+2,sfcWind,dcppA-hindcast,FGOALS-f3-L,/gws/nopw/j04/canari/users/benhutch/dcppA-hindcast/sfcWind/FGOALS-f3-L/data
+3,sfcWind,dcppA-hindcast,IPSL-CM6A-LR,/gws/nopw/j04/canari/users/benhutch/dcppA-hindcast/sfcWind/IPSL-CM6A-LR/data
+4,sfcWind,dcppA-hindcast,MIROC6,/gws/nopw/j04/canari/users/benhutch/dcppA-hindcast/sfcWind/MIROC6/data
+5,sfcWind,dcppA-hindcast,MPI-ESM1-2-HR,/gws/nopw/j04/canari/users/benhutch/dcppA-hindcast/sfcWind/MPI-ESM1-2-HR/data
+6,sfcWind,dcppA-hindcast,CanESM5,/gws/nopw/j04/canari/users/benhutch/dcppA-hindcast/sfcWind/CanESM5/data

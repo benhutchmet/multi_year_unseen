@@ -23,3 +23,6 @@ regrid_hadgem_obs_path = "/home/users/benhutch/ERA5/surface_wind_ERA5_regrid_Had
 
 # Set up the gws base dir
 gws_base = "/gws/nopw/j04/canari/users/benhutch"
+
+# Create a nested dictionary of the data_paths for each model and variable
+

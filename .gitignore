@@ -9,6 +9,10 @@ __pycache__/
 # Ignore drawio drawings    
 *.drawio
 
+# Ignore any .csv files
+*.csv
+paths/*.csv
+
 # Distribution / packaging
 .Python
 build/
