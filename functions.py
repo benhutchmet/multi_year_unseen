@@ -418,3 +418,81 @@ def calculate_obs_stats(obs_data: np.ndarray,
 
     # Return the obs stats
     return obs_stats
+
+# Write a function which does the plotting
+def plot_events(model_data: np.ndarray,
+                obs_data: np.ndarray,
+                obs_stats: dict,
+                start_year: int,
+                end_year: int,
+                bias_adjust: bool = True,
+                figsize_x: int = 10,
+                figsize_y: int = 10):
+    """
+    Plots the events on the same axis.
+
+    Parameters
+    ----------
+
+    model_data: np.ndarray
+        The model data
+        With shape (nyears, nmembers, nmonths)
+
+    obs_data: np.ndarray
+        The observations data
+        With shape (nyears, nmonths)
+
+    obs_stats: dict
+        A dictionary containing the obs stats
+
+    start_year: int
+        The start year for the data
+        E.g. 1961
+
+    end_year: int
+        The end year for the data
+        E.g. 1990
+
+    bias_adjust: bool
+        Whether to bias adjust the model data
+        Default is True
+
+    figsize_x: int
+        The figure size in the x direction
+        Default is 10
+
+    figsize_y: int
+        The figure size in the y direction
+        Default is 10
+
+    Returns
+    -------
+    None
+    """
+
+    # Set up the years
+    years = np.arange(start_year, end_year + 1)
+
+    # Take the mean over the 2th axis (i.e. over the months)
+    # For the model data
+    model_year = np.mean(model_data, axis=2)
+
+    # Take the mean over the 1th axis (i.e. over the members)
+    # For the obs data
+    obs_year = np.mean(obs_data, axis=1)    
+
+    # if the bias adjust is True
+    if bias_adjust:
+        print("Bias adjusting the model data")
+        
+        # Flatten the model data
+        model_flat = model_year.flatten()
+
+        # Find the difference between the model and obs
+        bias = np.mean(model_flat) - np.mean(obs_year)
+
+        # Add the bias to the model data
+        model_year = model_year - bias
+
+    # Set the figure size
+    plt.figure(figsize=(figsize_x, figsize_y))
