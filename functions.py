@@ -167,3 +167,8 @@ def load_model_data(model_variable: str,
 
     # Print the shape of the model data
     print("Shape of model data:", model_data.shape)
+
+    # Loop over the years
+    for year in years:
+        # Logging
+        print("Loading year:", year)
