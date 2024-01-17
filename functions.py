@@ -172,3 +172,26 @@ def load_model_data(model_variable: str,
     for year in years:
         # Logging
         print("Loading year:", year)
+        for member in range(no_members):
+            print("Loading member index:", member)
+            # Find the file for the given year and member
+            file = [file for file in model_file_list if f"s{year}" in file and f"r{member + 1}i" in file][0]
+
+            # Load the file
+            ds = xr.open_dataset(f"{model_path}/{file}", chunks={'time': 10})
+
+            # Extract the time series for the gridbox
+            ds = ds.sel(lat=slice(lat1, lat2),
+                        lon=slice(lon1, lon2)).mean(dim=('lat','lon'))
+
+            # Extract the time slice between
+            ds_slice = ds.sel(time=slice(f"{year}-12-01", f"{year + avg_period}-11-30"))
+
+            # Extract the data
+            model_data[year - start_year, member, :] = ds_slice[model_variable].values
+
+    # p[rint the shape of the model data
+    print("Shape of model data:", model_data.shape)
+
+    # Return the model data
+    return model_data
