@@ -336,6 +336,7 @@ def calculate_obs_stats(obs_data: np.ndarray,
 
     # Define the obs stats
     obs_stats = {
+        'avg_period_mean': [],
         'mean': mdi,
         'sigma': mdi,
         'skew': mdi,
@@ -372,6 +373,9 @@ def calculate_obs_stats(obs_data: np.ndarray,
 
     # Take the mean over the 1th axis (i.e. over the 12 months)
     obs_year = np.mean(obs_copy, axis=1)
+
+    # Set the average period mean
+    obs_stats['avg_period_mean'] = obs_year
 
     # Get the sample size
     obs_stats['sample_size'] = len(obs_year)

@@ -13,6 +13,9 @@ __pycache__/
 *.csv
 paths/*.csv
 
+# Ignore anything in workflow
+workflow/*
+
 # Distribution / packaging
 .Python
 build/
