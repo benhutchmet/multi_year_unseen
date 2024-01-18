@@ -12,6 +12,7 @@ import pandas as pd
 from tqdm import tqdm
 from scipy import stats
 import matplotlib.pyplot as plt
+from datetime import datetime, timedelta
 
 # Path to modules
 import dictionaries as dicts
@@ -241,6 +242,9 @@ def load_obs_data(obs_variable: str,
     # Set up the years
     years = np.arange(start_year, end_year + 1)
 
+    # Set up the new years
+    new_years = []
+
     # Set the n years
     n_years = len(years)
 
@@ -259,6 +263,29 @@ def load_obs_data(obs_variable: str,
     obs = obs.sel(lat=slice(lat1, lat2),
                   lon=slice(lon1, lon2)).mean(dim=('lat','lon'))
     
+    # Convert numpy.datetime64 to datetime
+    final_time = obs['time'][-1].values.astype(str)
+
+    # Extract the year and month
+    final_year = int(final_time[:4])
+    final_month = int(final_time[5:7])
+
+    # If the final time is not november or december
+    if not (final_month == 11 or final_month == 12):
+        # Check that the final year - avg_period is not less than the end year
+        if (final_year - 1) - avg_period < end_year:
+            # Set the end year to the final year - avg_period
+            end_year = (final_year - 1) - avg_period
+    else:
+        print("The final year has november or december")
+
+    # Set the new years
+    new_years = np.arange(start_year, end_year + 1)
+    
+    # Print the first time of the new years
+    print("First time:", new_years[0])
+    print("Last time:", new_years[-1])
+
     # Print the years we are slicing over
     print("Slicing over:", f"{start_year}-12-01", f"{start_year + avg_period}-11-30")
 
@@ -273,13 +300,15 @@ def load_obs_data(obs_variable: str,
     print("Number of months:", n_months)
 
     # Form the empty array to store the data
-    obs_data = np.zeros([n_years, n_months])
+    obs_data = np.zeros([len(new_years), n_months])
 
     # Print the shape of the obs data
     print("Shape of obs data:", obs_data.shape)
 
     # Loop over the years
-    for year in tqdm(years, desc="Processing years"):
+    for year in tqdm(new_years, desc="Processing years"):
+        # We only have obs upt to jjuly 2023
+        
         # Extract the time slice between
         obs_slice = obs.sel(time=slice(f"{year}-12-01",
                                        f"{year + avg_period}-11-30"))
@@ -290,8 +319,11 @@ def load_obs_data(obs_variable: str,
     # Print the shape of the obs data
     print("Shape of obs data:", obs_data.shape)
 
+    # Set up the obs years
+    obs_years = np.arange(new_years[0], new_years[-1] + 1)
+
     # Return the obs data
-    return obs_data
+    return obs_data, obs_years
 
 # Function for calculating the obs_stats
 def calculate_obs_stats(obs_data: np.ndarray,
@@ -503,8 +535,6 @@ def plot_events(model_data: np.ndarray,
 
     # Plot the model data
     for i in range(model_year.shape[1]):
-        # Plot the model data
-        plt.scatter(years, model_year[:, i], label=f'Model {i + 1}')
 
         # Separate data into two groups based on the condition
         below_20th = model_year[:, i] < obs_stats['min_20']
