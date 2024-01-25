@@ -4,6 +4,7 @@
 import os
 import sys
 import glob
+import random
 
 # Third party imports
 import numpy as np
@@ -598,4 +599,88 @@ def model_stats_bs(model: np.ndarray,
         'mean', 'sigma', 'skew', 'kurt'
     """
 
+    # Set up the model stats
+    model_stats = {
+        'mean': [],
+        'sigma': [],
+        'skew': [],
+        'kurt': []
+    }
+
+    # Set up the number of years
+    n_years = model.shape[0]
+
+    # Set up the number of members
+    n_members = model.shape[1]
+
+    # TODO: Does autocorrelation need to be accounted for?
+    # If so, use a block bootstrap
+
+    # Set up the arrays
+    mean_boot = np.zeros(nboot) ; sigma_boot = np.zeros(nboot)
+
+    skew_boot = np.zeros(nboot) ; kurt_boot = np.zeros(nboot)
+
+    # Create the indexes for the ensemble members
+    index_ens = range(n_members)
+
+    # Loop over the number of bootstraps
+    for iboot in tqdm(np.arange(nboot)):
+        print(f"Bootstrapping {iboot + 1} of {nboot}")
+
+        # Create the index for time
+        ind_time_this = range(0, n_years)
+
+        # Choose a random ensemble member
+        ind_ens_this = random.choices(index_ens, k=n_members)
+
+        # Print the ensemble member
+        print(f"ind_ens_this is {ind_ens_this}")
+
+        # Create an empty array to store the data
+        model_boot = np.zeros([n_years])
+
+        # Set the year index
+        year_index = 0
+
+        # Loop over the years
+        for itime in ind_time_this:
+            print(f"itime is {itime} of {n_years}")
+            print(f"year_index is {year_index} of {n_years}"
+                  f"iboot is {iboot} of {nboot}"
+                  f"ind_ens_this is {ind_ens_this}")
+            # Extract the data
+            model_boot[year_index] = model[itime, ind_ens_this]
+
+            # Increment the year index
+            year_index += 1
+
+        
+        # Calculate the mean
+        mean_boot[iboot] = np.mean(model_boot)
+
+        # Calculate the sigma
+        sigma_boot[iboot] = np.std(model_boot)
+
+        # Calculate the skew
+        skew_boot[iboot] = stats.skew(model_boot)
+
+        # Calculate the kurtosis
+        kurt_boot[iboot] = stats.kurtosis(model_boot)
+
+    # Append the mean to the model stats
+    model_stats['mean'] = mean_boot
+
+    # Append the sigma to the model stats
+    model_stats['sigma'] = sigma_boot
+
+    # Append the skew to the model stats
+    model_stats['skew'] = skew_boot
+
+    # Append the kurt to the model stats
+    model_stats['kurt'] = kurt_boot
+
+    # Return the model stats
+    return model_stats
     
+
