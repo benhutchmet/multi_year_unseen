@@ -631,12 +631,6 @@ def model_stats_bs(model: np.ndarray,
         # Create the index for time
         ind_time_this = range(0, n_years)
 
-        # Choose a random ensemble member
-        ind_ens_this = random.choices(index_ens, k=n_members)
-
-        # Print the ensemble member
-        print(f"ind_ens_this is {ind_ens_this}")
-
         # Create an empty array to store the data
         model_boot = np.zeros([n_years])
 
@@ -645,10 +639,16 @@ def model_stats_bs(model: np.ndarray,
 
         # Loop over the years
         for itime in ind_time_this:
+
+            # Select a random ensemble member
+            ind_ens_this = random.choices(index_ens)
+
+            # Logging
             print(f"itime is {itime} of {n_years}")
-            print(f"year_index is {year_index} of {n_years}"
-                  f"iboot is {iboot} of {nboot}"
+            print(f"year_index is {year_index} of {n_years} "
+                  f"iboot is {iboot} of {nboot} "
                   f"ind_ens_this is {ind_ens_this}")
+            
             # Extract the data
             model_boot[year_index] = model[itime, ind_ens_this]
 
@@ -683,4 +683,130 @@ def model_stats_bs(model: np.ndarray,
     # Return the model stats
     return model_stats
     
+
+# Write a function which plots the four moments
+def plot_moments(model_stats: dict,
+                 obs_stats: dict,
+                 figsize_x: int = 10,
+                 figsize_y: int = 10,
+                 save_dir: str = "/gws/nopw/j04/canari/users/benhutch/plots/") -> None:
+    """
+    Plot the four moments of the distribution of the model data and the
+    observations.
+    
+    Parameters
+    ----------
+    
+    model_stats: dict
+        A dictionary containing the model stats with the following keys:
+        'mean', 'sigma', 'skew', 'kurt'
+
+    obs_stats: dict
+        A dictionary containing the obs stats
+
+    figsize_x: int
+        The figure size in the x direction
+        Default is 10
+
+    figsize_y: int
+        The figure size in the y direction
+        Default is 10
+
+    save_dir: str
+        The directory to save the plots to
+        Default is "/gws/nopw/j04/canari/users/benhutch/plots/"
+
+    Output
+    ------
+
+    None
+    """
+    
+    # Set up the figure as a 2x2
+    fig, axs = plt.subplots(2, 2, figsize=(figsize_x, figsize_y))
+
+    ax1, ax2, ax3, ax4 = axs.ravel()
+
+    # Plot the mean
+    ax1.hist(model_stats['mean'], bins=100, density=True,
+            color='red', label='model')
+    
+    # Plot the mean of the obs
+    ax1.axvline(obs_stats['mean'], color='black', linestyle='-',
+                label='ERA5')
+    
+    # Calculate the position of the obs mean in the distribution
+    obs_mean_pos = stats.percentileofscore(model_stats['mean'], obs_stats['mean'])
+
+    # Add a title
+    ax1.set_title(f'Mean, {obs_mean_pos:.2f}%')
+
+    # Include a textbox in the top right corner
+    ax1.text(0.95, 0.95, "a)", transform=ax1.transAxes,
+            fontsize=10, fontweight='bold', va='top', ha='right',
+            bbox=dict(boxstyle='square', facecolor='white', alpha=0.5),
+            zorder=100)
+
+    # Plot the skewness
+    ax2.hist(model_stats['skew'], bins=100, density=True,
+            color='red', label='model')
+
+    # Plot the skewness of the obs
+    ax2.axvline(obs_stats['skew'], color='black', linestyle='-',
+                label='ERA5')
+    
+    # Calculate the position of the obs skewness in the distribution
+    obs_skew_pos = stats.percentileofscore(model_stats['skew'], obs_stats['skew'])
+
+    # Add a title
+    ax2.set_title(f'Skewness, {obs_skew_pos:.2f}%')
+
+    # Include a textbox in the top right corner
+    ax2.text(0.95, 0.95, "b)", transform=ax2.transAxes,
+            fontsize=10, fontweight='bold', va='top', ha='right',
+            bbox=dict(boxstyle='square', facecolor='white', alpha=0.5),
+            zorder=100)
+
+    # Plot the kurtosis
+    ax3.hist(model_stats['kurt'], bins=100, density=True,
+            color='red', label='model')
+    
+    # Plot the kurtosis of the obs
+    ax3.axvline(obs_stats['kurt'], color='black', linestyle='-',
+                label='ERA5')
+    
+    # Calculate the position of the obs kurtosis in the distribution
+    obs_kurt_pos = stats.percentileofscore(model_stats['kurt'], obs_stats['kurt'])
+
+    # Add a title
+    ax3.set_title(f'Kurtosis, {obs_kurt_pos:.2f}%')
+
+    # Include a textbox in the top right corner
+    ax3.text(0.95, 0.95, "c)", transform=ax3.transAxes,
+            fontsize=10, fontweight='bold', va='top', ha='right',
+            bbox=dict(boxstyle='square', facecolor='white', alpha=0.5),
+            zorder=100)
+
+    # Plot the sigma
+    ax4.hist(model_stats['sigma'], bins=100, density=True,
+            color='red', label='model')
+    
+    # Plot the sigma of the obs
+    ax4.axvline(obs_stats['sigma'], color='black', linestyle='-',
+                label='ERA5')
+    
+    # Calculate the position of the obs sigma in the distribution
+    obs_sigma_pos = stats.percentileofscore(model_stats['sigma'], obs_stats['sigma'])
+
+    # Add a title
+    ax4.set_title(f'Standard deviation, {obs_sigma_pos:.2f}%')
+
+    # Include a textbox in the top right corner
+    ax4.text(0.95, 0.95, "d)", transform=ax4.transAxes,
+            fontsize=10, fontweight='bold', va='top', ha='right',
+            bbox=dict(boxstyle='square', facecolor='white', alpha=0.5),
+            zorder=100)
+    
+    return
+
 
