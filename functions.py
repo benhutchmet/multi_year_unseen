@@ -567,3 +567,35 @@ def plot_events(model_data: np.ndarray,
 
     # Show the plot
     plt.show()
+
+
+# Write a function which does the bootstrapping to calculate the statistics
+def model_stats_bs(model: np.ndarray,
+                   nboot: int = 10000) -> dict:
+    """
+    Repeatedly samples the model data with replacement across its members to
+    produce many samples equal in length to the reanalysis time series. This 
+    gives a single pseudo-time series from which the moments of the distribution
+    can be calculated. The process is repeated to give a distribution of the
+    moments.
+
+    Parameters
+    ----------
+
+    model: np.ndarray
+        The model data
+        With shape (nyears, nmembers, nmonths)
+
+    nboot: int
+        The number of bootstrap samples to take
+        Default is 10000
+
+    Returns
+    -------
+
+    model_stats: dict
+        A dictionary containing the model stats with the following keys:
+        'mean', 'sigma', 'skew', 'kurt'
+    """
+
+    
