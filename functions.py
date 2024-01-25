@@ -809,4 +809,7 @@ def plot_moments(model_stats: dict,
     
     return
 
+# Write a function to plot the distribution of the model and obs data
+def plot_distribution()
+
 
